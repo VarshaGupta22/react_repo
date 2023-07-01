@@ -7,6 +7,8 @@ import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -29,17 +31,31 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
 }));
 
 export default function TableData(props) {
-  const { FormData, setFormData } = props;
-  function deleteHandler(index) {
+  const { setIsEdit, FormData, setFormData, setOpen, setInputData } = props;
+
+  function deleteHandler(Candiate_contact) {
     const data = FormData.filter((e, i) => {
-      console.log("3444444", index, i);
-      return index !== i;
+      console.log("3444444", i);
+      return e.Candiate_contact !== Candiate_contact; //index !== i;
     });
     console.log("data after deletion", data);
     setFormData(data);
     const dat = JSON.stringify(data);
     console.log("38maodal", data);
     localStorage.setItem("candidate", dat);
+  }
+  function updateHandler(row, index) {
+    console.log("45", row);
+    setIsEdit(true);
+    setOpen(true);
+    setInputData(row);
+  }
+
+  function notify() {
+    toast.success("deleted successfully", {
+      position: "top-right",
+      autoClose: 3000,
+    });
   }
 
   return (
@@ -75,13 +91,21 @@ export default function TableData(props) {
                 {row.Candiate_gender}
               </StyledTableCell>
               <StyledTableCell align="right">
-                <button className="items">update</button>
+                <button
+                  className="items"
+                  onClick={() => {
+                    updateHandler(row);
+                  }}
+                >
+                  update
+                </button>
               </StyledTableCell>
               <StyledTableCell align="right">
                 <button
                   className="items"
                   onClick={() => {
-                    deleteHandler(index);
+                    deleteHandler(row.Candiate_contact);
+                    notify();
                   }}
                 >
                   delete

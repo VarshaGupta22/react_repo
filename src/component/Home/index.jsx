@@ -1,13 +1,12 @@
 import React, { useEffect, useState } from "react";
 import Modal from "../Modal";
 import TableData from "../Table";
+import { ToastContainer } from "react-toastify";
 
 export default function Home() {
   const [open, setOpen] = useState(false);
-  const [formData, setFormData] = useState([]);
-  function openModelHandeler() {
-    setOpen(true);
-  }
+  const [isEdit, setIsEdit] = useState(false);
+
   const [inputData, setInputData] = useState({
     Candiate_name: "",
     Candiate_email: "",
@@ -17,10 +16,15 @@ export default function Home() {
     Candiate_address: "",
   });
 
+  const [formData, setFormData] = useState([]);
+  function openModelHandeler() {
+    setOpen(true);
+  }
+
   function onclose() {
     setOpen(false);
   }
-  console.log("15 formData from home page", formData);
+  console.log("15 formData from home page", inputData);
   function onComponentMount() {
     const data = localStorage.getItem("candidate");
     const orginalDataforTable = JSON.parse(data);
@@ -30,6 +34,7 @@ export default function Home() {
       setFormData([...orginalDataforTable]);
     }
   }
+
   useEffect(onComponentMount, []);
 
   return (
@@ -37,6 +42,7 @@ export default function Home() {
       <button
         onClick={() => {
           openModelHandeler();
+          setIsEdit(false);
         }}
         className="items"
       >
@@ -45,6 +51,7 @@ export default function Home() {
 
       <Modal
         oppen={open}
+        isEdit={isEdit}
         onclose={onclose}
         setFormData={setFormData}
         inputData={inputData}
@@ -54,7 +61,10 @@ export default function Home() {
         FormData={formData}
         setFormData={setFormData}
         setInputData={setInputData}
+        setOpen={setOpen}
+        setIsEdit={setIsEdit}
       />
+      <ToastContainer />
     </div>
   );
 }

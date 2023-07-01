@@ -1,6 +1,9 @@
 import { Modal, Box, Typography } from "@mui/material";
 import { useState } from "react";
 import "./modal.css";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
 const style = {
   position: "absolute",
   top: "50%",
@@ -14,18 +17,11 @@ const style = {
 };
 export default function Modala(props) {
   console.log("16 props fro modal from home", props);
-  const { setFormData, onclose, oppen, inputData, setInputData } = props;
-  // const [inputData, setInputData] = useState({
-  //   Candiate_name: "",
-  //   Candiate_email: "",
-  //   Candiate_age: "",
-  //   Candiate_contact: "",
-  //   Candiate_gender: "",
-  //   Candiate_address: "",
-  // });
+  const { setFormData, isEdit, onclose, oppen, inputData, setInputData } =
+    props;
 
   function onchangeInputHandler(e) {
-    console.log("Saved");
+    console.log("Saved", e.target.value);
     const nameData = e.target.name;
     const valueData = e.target.value;
     setInputData((prevel) => {
@@ -34,17 +30,49 @@ export default function Modala(props) {
   }
 
   function SubmitHendler() {
-    setFormData((prevel) => {
-      const data = JSON.stringify([...prevel, inputData]);
-      console.log("38maodal", data);
-      localStorage.setItem("candidate", data);
-      return [...prevel, inputData];
-    });
+    if (isEdit) {
+      setFormData((prevel) => {
+        const tempData = prevel.map((user) => {
+          console.log("user", user.Candiate_name, inputData.Candiate_name);
+          if (user.Candiate_name === inputData.Candiate_name) {
+            return inputData;
+          } else {
+            return user;
+          }
+        });
+        console.log("object", tempData);
+        const data = JSON.stringify([...tempData]);
+        console.log("38maodal", data);
+        localStorage.setItem("candidate", data);
+        return [...tempData];
+      });
+    } else {
+      setFormData((prevel) => {
+        const data = JSON.stringify([...prevel, inputData]);
+        console.log("38maodal", data);
+        localStorage.setItem("candidate", data);
+        return [...prevel, inputData];
+      });
+    }
+  }
+
+  function notifyus() {
+    if (isEdit) {
+      toast.success("updated successfully", {
+        position: "top-right",
+        autoClose: 2000,
+      });
+    } else {
+      toast.success("created successfully", {
+        position: "top-right",
+        autoClose: 2000,
+      });
+    }
   }
 
   return (
     <div>
-      <Modal open={oppen} onClose={onclose}>
+      <Modal open={oppen} onClose={onclose} setEdit={true}>
         <Box sx={style}>
           <Typography id="modal-modal-title" variant="h6" component="h2">
             Fill details
@@ -81,6 +109,7 @@ export default function Modala(props) {
                   name="Candiate_contact"
                   value={inputData.Candiate_contact}
                   onChange={onchangeInputHandler}
+                  disabled={isEdit ? true : false}
                 />
               </h1>
               <h1>
@@ -102,7 +131,13 @@ export default function Modala(props) {
             </div>
 
             <div>
-              <button className="items" onClick={SubmitHendler}>
+              <button
+                className="items"
+                onClick={() => {
+                  SubmitHendler();
+                  notifyus();
+                }}
+              >
                 Save details
               </button>
             </div>
